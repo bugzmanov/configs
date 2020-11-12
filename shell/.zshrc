@@ -149,6 +149,7 @@ echo -ne '\e[5 q' # Use beam shape cursor on startup.
 preexec() { echo -ne '\e[5 q' ;} # Use beam shape cursor for each new prompt.
 
 # Use lf to switch directories and bind it to ctrl-o
+# https://github.com/gokcehan/lf
 lfcd () {
     tmp="$(mktemp)"
     lf -last-dir-path="$tmp" "$@"
@@ -170,6 +171,7 @@ bindkey '^e' edit-command-line
 
 function exists { which $1 &> /dev/null }
 
+# https://stackoverflow.com/questions/14040351/filtering-zsh-history-by-command
 if exists percol; then
     function percol_select_history() {
         local tac
@@ -183,6 +185,7 @@ if exists percol; then
     bindkey '^R' percol_select_history
 fi
 
+#https://github.com/ogham/exa
 alias ls='exa'                                                          # ls
 alias l='exa -lbF --git'                                                # list, size, type, git
 alias ll='exa -lbGF --git'                                             # long list
@@ -194,4 +197,5 @@ alias lx='exa -lbhHigUmuSa@ --time-style=long-iso --git --color-scale' # all + e
 alias lS='exa -1'                                                              # one column, just names
 alias lt='exa --tree --level=2'
 
+#https://github.com/zsh-users/zsh-syntax-highlighting
 source /Users/rafaelbagmanov/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
