@@ -1,0 +1,93 @@
+{
+  "workbench.colorTheme": "Tomorrow Night Blue",
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "editor.minimap.enabled": false,
+  "editor.lineNumbers": "relative",
+  "editor.columnSelection": false,
+  "diffEditor.ignoreTrimWhitespace": true,
+  "diffEditor.maxComputationTime": 0,
+  "vim.easymotion": true,
+  "vim.surround": true,
+  "vim.replaceWithRegister": true,
+  "vim.incsearch": true,
+  "vim.ignorecase": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["j", "j"],
+      "after": ["<Esc>"]
+    }
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<leader>", "P"],
+      "after": ["O", "<Esc>", "p" ]
+    },
+    {
+      "before": ["<leader>", "p"],
+      "after": ["o", "<Esc>", "p" ]
+    },
+    {
+      "before": ["<leader>", "d"],
+      "after": ["d", "d"]
+    },
+    {
+      "before": ["<C-n>"],
+      "commands": [":nohl"]
+    },
+    {
+        "before": ["L"],
+        "after": ["$"]
+    },
+    {
+        "before": ["H"],
+        "after": ["^"]
+    },
+    {
+      "before":["<leader>","p"],
+      "after": ["\"","_","d","P"]
+    },
+    {
+      "before":["<leader>","d"],
+      "after": ["\"","_","d"]
+    }
+  ],
+  "vim.leader": "<space>",
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false
+  },
+  "diffEditor.renderSideBySide": false,
+  "vim.easymotionMarkerBackgroundColor": "black",
+  "[rust]": {
+    "editor.defaultFormatter": "matklad.rust-analyzer"
+  },
+  "vim.otherModesKeyBindingsNonRecursive": [
+    {
+        "before": ["<C-w>", "+"],
+        "after": [],
+        "commands": [
+            {"command": "workbench.action.increaseViewSize", "args": []}
+        ]
+    },
+    {
+        "before": ["<C-w>", "="],
+        "after": [],
+        "commands": [
+            {"command": "workbench.action.increaseViewSize", "args": []}
+        ]
+    },
+    {
+        "before": ["<C-w>", "-"],
+        "after": [],
+        "commands": [
+            {"command": "workbench.action.decreaseViewSize", "args": []}
+        ]
+    },
+  ],
+  "window.zoomLevel": 0,
+  "omnisharp.useGlobalMono": "always"
+}
