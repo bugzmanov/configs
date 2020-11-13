@@ -112,6 +112,7 @@ setopt    incappendhistory
 # Basic auto/tab complete:
 autoload -U compinit
 zstyle ':completion:*' menu select
+zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(|.|..) ]] && reply=(..)'
 zmodload zsh/complist
 compinit
 _comp_options+=(globdots)		# Include hidden files.
