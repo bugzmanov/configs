@@ -20,6 +20,7 @@ Plug 'lokaltog/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
+Plug 'justinmk/vim-sneak'
 
 " Fuzzy finder
 Plug 'airblade/vim-rooter'
