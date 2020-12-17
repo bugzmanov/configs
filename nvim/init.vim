@@ -11,6 +11,8 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
+Plug 'justinmk/vim-sneak'
+
 
 " GUI enhancements
 Plug 'itchyny/lightline.vim'
@@ -20,7 +22,6 @@ Plug 'lokaltog/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
-Plug 'justinmk/vim-sneak'
 
 " Fuzzy finder
 Plug 'airblade/vim-rooter'
@@ -112,7 +113,19 @@ nnoremap ? ?\v
 nnoremap / /\v
 cnoremap %s/ %sm/
 
+" Like idea
+nmap <C-l> $
+nmap <C-h> ^
+noremap <Leader>y "*y
+noremap <Leader>p "*p
+noremap <Leader>Y "+y
+noremap <Leader>P "+p
+map <leader>a :action $SelectAll<CR>
 
+vnoremap * y <Esc>/<C-r>0<CR>
+nnoremap <Esc> :nohlsearch<CR>
+
+"
 " =============================================================================
 " # GUI settings
 " =============================================================================
