@@ -2,6 +2,9 @@ let mapleader = "\<Space>"
 
 set nocompatible
 filetype off
+
+
+so ~/.config/nvim/plug.vim
 call plug#begin()
 
 " Load plugins
@@ -28,12 +31,19 @@ Plug 'airblade/vim-rooter'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+
+"
 " Syntactic language support
 Plug 'cespare/vim-toml'
 Plug 'stephpy/vim-yaml'
 Plug 'rust-lang/rust.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
@@ -125,6 +135,35 @@ map <leader>a :action $SelectAll<CR>
 vnoremap * y <Esc>/<C-r>0<CR>
 nnoremap <Esc> :nohlsearch<CR>
 
+" nnoremap <leader> ne  :Denite -resume -cursor-pos=+1 -immediately<CR>
+" GoTo code navigation.
+nmap gd <Plug>(coc-definition)
+nmap gs <Plug>(coc-type-definition)
+nmap gi <Plug>(coc-implementation)
+nmap gr <Plug>(coc-references)
+nmap <leader>rr <Plug>(coc-rename)
+nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
+nmap <silent> <leader>NE <Plug>(coc-diagnostic-prev-error)
+nmap <leader>g[ <Plug>(coc-diagnostic-prev)
+nmap <leader>g] <Plug>(coc-diagnostic-next)
+"
+" nnoremap <silent> <space>k  :Denite -resume -cursor-pos=-1 -immediately<CR>
+" Telescope search
+" Using lua functions
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+
+filetype plugin indent on
+" show existing tab with 4 spaces width
+set tabstop=2
+" when indenting with '>', use 4 spaces width
+set shiftwidth=2
+" On pressing tab, insert 4 spaces
+set expandtab
+set smartindent
+
 "
 " =============================================================================
 " # GUI settings
@@ -169,3 +208,16 @@ colorscheme OceanicNext
 highlight LineNr ctermfg=darkgrey
 
 
+
+" COC
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
