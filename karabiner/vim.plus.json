@@ -2881,7 +2881,12 @@
         {
           "type": "basic",
           "from": {
-            "key_code": "C"
+            "key_code": "c",
+            "modifiers": {
+              "mandatory": [
+                "shift"
+              ]
+            }
           },
           "to": [
             {
