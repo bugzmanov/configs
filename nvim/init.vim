@@ -14,7 +14,6 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
-Plug 'justinmk/vim-sneak'
 
 
 " GUI enhancements
@@ -35,7 +34,6 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 
-"
 " Syntactic language support
 Plug 'cespare/vim-toml'
 Plug 'stephpy/vim-yaml'
@@ -44,6 +42,12 @@ Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'scalameta/coc-metals', {'do': 'yarn install --frozen-lockfile'}
+
+" Requires https://www.nerdfonts.com/font-downloads
+Plug 'kyazdani42/nvim-web-devicons'
+" Buffers as tabs
+Plug 'romgrk/barbar.nvim'
 
 call plug#end()
 
@@ -135,25 +139,24 @@ map <leader>a :action $SelectAll<CR>
 vnoremap * y <Esc>/<C-r>0<CR>
 nnoremap <Esc> :nohlsearch<CR>
 
-" nnoremap <leader> ne  :Denite -resume -cursor-pos=+1 -immediately<CR>
-" GoTo code navigation.
-nmap gd <Plug>(coc-definition)
-nmap gs <Plug>(coc-type-definition)
-nmap gi <Plug>(coc-implementation)
-nmap gr <Plug>(coc-references)
-nmap <leader>rr <Plug>(coc-rename)
-nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
-nmap <silent> <leader>NE <Plug>(coc-diagnostic-prev-error)
-nmap <leader>g[ <Plug>(coc-diagnostic-prev)
-nmap <leader>g] <Plug>(coc-diagnostic-next)
 "
 " nnoremap <silent> <space>k  :Denite -resume -cursor-pos=-1 -immediately<CR>
 " Telescope search
 " Using lua functions
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+" Show buffers panel
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+lua require('telescope').setup{ defaults = { file_ignore_patterns = {"target"} } }
+
+"
+" Next buffer in list
+nmap     <Leader>] :bn<CR>  
+" Previous buffer in list
+nmap     <Leader>[ :bp<CR>
+
+
 
 filetype plugin indent on
 " show existing tab with 4 spaces width
@@ -163,6 +166,8 @@ set shiftwidth=2
 " On pressing tab, insert 4 spaces
 set expandtab
 set smartindent
+
+nnoremap <leader>sv :source ~/.config/nvim/init.vim<CR>
 
 "
 " =============================================================================
@@ -207,9 +212,23 @@ colorscheme OceanicNext
 
 highlight LineNr ctermfg=darkgrey
 
+" ============================
+"    COC + Coc Metals
+" ============================
+source ~/.config/nvim/coc-mappings.vim
 
+" nnoremap <leader> ne  :Denite -resume -cursor-pos=+1 -immediately<CR>
+" GoTo code navigation.
+nmap gd <Plug>(coc-definition)
+nmap gs <Plug>(coc-type-definition)
+nmap gi <Plug>(coc-implementation)
+nmap gr <Plug>(coc-references)
+nmap <leader>rr <Plug>(coc-rename)
+nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
+nmap <silent> <leader>NE <Plug>(coc-diagnostic-prev-error)
+nmap <leader>g[ <Plug>(coc-diagnostic-prev)
+nmap <leader>g] <Plug>(coc-diagnostic-next)
 
-" COC
 " use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -221,3 +240,7 @@ inoremap <silent><expr> <Tab>
       \ <SID>check_back_space() ? "\<Tab>" :
       \ coc#refresh()
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" Help Vim recognize *.sbt and *.sc as Scala files
+au BufRead,BufNewFile *.sbt,*.sc set filetype=scala
+

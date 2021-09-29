@@ -1,3 +1,7 @@
 {
-  "diagnostic.checkCurrentLine": true
+  "diagnostic.checkCurrentLine": true,
+  "metals.showInferredType": true,
+  "metals.enableIndentOnPaste": true,
+  "coc.preferences.formatOnSaveFiletypes": ["scala"]
 }
+
