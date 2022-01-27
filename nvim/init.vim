@@ -14,6 +14,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
+Plug 'wellle/targets.vim'
 
 
 " GUI enhancements
@@ -40,22 +41,29 @@ Plug 'stephpy/vim-yaml'
 Plug 'rust-lang/rust.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'scrooloose/syntastic'
+Plug 'neomake/neomake'
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'scalameta/coc-metals', {'do': 'yarn install --frozen-lockfile'}
+Plug 'vim-test/vim-test'
 
 " Requires https://www.nerdfonts.com/font-downloads
 Plug 'kyazdani42/nvim-web-devicons'
 " Buffers as tabs
 Plug 'romgrk/barbar.nvim'
 
+call coc#add_extension(
+  \ 'coc-rust-analyzer',
+\ )
+
 call plug#end()
 
-if has('nvim')
-    set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
-    set inccommand=nosplit
-    noremap <C-q> :confirm qall<CR>
-end
+" if has('nvim')
+"     set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
+"     set inccommand=nosplit
+"     noremap <C-q> :confirm qall<CR>
+" end
 
 " Lightline
 let g:lightline = {
@@ -134,7 +142,13 @@ noremap <Leader>y "*y
 noremap <Leader>p "*p
 noremap <Leader>Y "+y
 noremap <Leader>P "+p
-map <leader>a :action $SelectAll<CR>
+" map <leader>a :action $SelectAll<CR>
+" Remap for do codeAction of selected region
+function! s:cocActionsOpenFromSelected(type) abort
+  execute 'CocCommand actions.open ' . a:type
+endfunction
+xmap <silent> <leader>a :<C-u>execute 'CocCommand actions.open ' . visualmode()<CR>
+nmap <silent> <leader>a :<C-u>set operatorfunc=<SID>cocActionsOpenFromSelected<CR>g@
 
 vnoremap * y <Esc>/<C-r>0<CR>
 nnoremap <Esc> :nohlsearch<CR>
@@ -148,13 +162,16 @@ nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 " Show buffers panel
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
-lua require('telescope').setup{ defaults = { file_ignore_patterns = {"target"} } }
+lua require('telescope').setup{ defaults = { file_ignore_patterns = {"target", "fuzz/"} } }
 
-"
+" Buffer navigation
 " Next buffer in list
-nmap     <Leader>] :bn<CR>  
+nnoremap <Leader>[ :BufferPrevious<CR>
 " Previous buffer in list
-nmap     <Leader>[ :bp<CR>
+nnoremap <Leader>] :BufferNext<CR>
+nnoremap <Leader>q :BufferClose<CR>
+" nmap     <Leader>] :bn<CR>  
+" nmap     <Leader>[ :bp<CR>
 
 
 
@@ -162,13 +179,15 @@ filetype plugin indent on
 " show existing tab with 4 spaces width
 set tabstop=2
 " when indenting with '>', use 4 spaces width
-set shiftwidth=2
+set shiftwidth=4
 " On pressing tab, insert 4 spaces
 set expandtab
 set smartindent
 
 nnoremap <leader>sv :source ~/.config/nvim/init.vim<CR>
 
+" cargo fmt on save 
+let g:rustfmt_autosave = 1
 "
 " =============================================================================
 " # GUI settings
@@ -222,12 +241,17 @@ source ~/.config/nvim/coc-mappings.vim
 nmap gd <Plug>(coc-definition)
 nmap gs <Plug>(coc-type-definition)
 nmap gi <Plug>(coc-implementation)
-nmap gr <Plug>(coc-references)
+" nmap gr <Plug>(coc-references)
 nmap <leader>rr <Plug>(coc-rename)
+nmap <silent> <leader>nw <Plug>(coc-diagnostic-next)
 nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
-nmap <silent> <leader>NE <Plug>(coc-diagnostic-prev-error)
+" nmap <silent> <leader>nw <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>np <Plug>(coc-diagnostic-prev-error)
 nmap <leader>g[ <Plug>(coc-diagnostic-prev)
 nmap <leader>g] <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>tr :TestNearest<CR>
+nmap <silent> <leader>tf :TestFile<CR>
+nmap <silent> <leader>tl :TestLast<CR>
 
 " use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
@@ -243,4 +267,6 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 " Help Vim recognize *.sbt and *.sc as Scala files
 au BufRead,BufNewFile *.sbt,*.sc set filetype=scala
+
+" let g:node_client_debug = 1
 
