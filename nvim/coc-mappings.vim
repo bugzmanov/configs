@@ -97,7 +97,6 @@ augroup end
 
 " Remap for do codeAction of current line
 xmap <leader>a  <Plug>(coc-codeaction-line)
-nmap <leader>a  <Plug>(coc-codeaction-line)
 
 " Fix autofix problem of current line
 nmap <leader>qf  <Plug>(coc-fix-current)
@@ -144,3 +143,6 @@ nnoremap <silent> <space>tc :<C-u>CocCommand metals.tvp metalsCompile<CR>
 nnoremap <silent> <space>tb :<C-u>CocCommand metals.tvp metalsBuild<CR>
 " Reveal current current class (trait or object) in Tree View 'metalsPackages'
 nnoremap <silent> <space>tf :<C-u>CocCommand metals.revealInTreeView metalsPackages<CR>
+
+inoremap <C-P> <C-\><C-O>:call CocActionAsync('showSignatureHelp')<cr>
+
