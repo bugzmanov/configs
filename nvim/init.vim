@@ -249,9 +249,15 @@ nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
 nmap <silent> <leader>np <Plug>(coc-diagnostic-prev-error)
 nmap <leader>g[ <Plug>(coc-diagnostic-prev)
 nmap <leader>g] <Plug>(coc-diagnostic-next)
+
+" Vim-test stuff
 nmap <silent> <leader>tr :TestNearest<CR>
 nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>tl :TestLast<CR>
+let test#strategy = "neovim"
+if has('nvim')
+  tmap <C-o> <C-\><C-n><C-w>_
+endif
 
 " use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
