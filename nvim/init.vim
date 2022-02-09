@@ -41,7 +41,7 @@ Plug 'stephpy/vim-yaml'
 Plug 'rust-lang/rust.vim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
-Plug 'scrooloose/syntastic'
+" Plug 'scrooloose/syntastic' it doesn't play nicely with coc-rust-analyzer: https://github.com/fannheyward/coc-rust-analyzer/issues/55
 Plug 'neomake/neomake'
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
