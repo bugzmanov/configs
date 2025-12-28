@@ -11,7 +11,6 @@ call plug#begin()
 " VIM enhancements
 Plug 'ciaranm/securemodelines'
 Plug 'editorconfig/editorconfig-vim'
-Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'wellle/targets.vim'
@@ -19,15 +18,15 @@ Plug 'wellle/targets.vim'
 
 " GUI enhancements
 Plug 'itchyny/lightline.vim'
+Plug 'spywhere/lightline-lsp'
 Plug 'machakann/vim-highlightedyank'
 Plug 'andymass/vim-matchup'
-Plug 'lokaltog/vim-easymotion'
 Plug 'vim-scripts/ReplaceWithRegister'
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
 
 " Fuzzy finder
-Plug 'airblade/vim-rooter'
+" Plug 'airblade/vim-rooter'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
@@ -39,13 +38,18 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'cespare/vim-toml'
 Plug 'stephpy/vim-yaml'
 Plug 'rust-lang/rust.vim'
+" Plug 'simrat39/rust-tools.nvim'
+" Plug 'mrcjkb/rustaceanvim'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
-" Plug 'scrooloose/syntastic' it doesn't play nicely with coc-rust-analyzer: https://github.com/fannheyward/coc-rust-analyzer/issues/55
+" Plug 'scrooloose/syntastic'
 Plug 'neomake/neomake'
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'scalameta/coc-metals', {'do': 'yarn install --frozen-lockfile'}
+" CoC
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'scalameta/coc-metals', {'do': 'yarn install --frozen-lockfile'}
+Plug 'scalameta/nvim-metals'
+
 Plug 'vim-test/vim-test'
 
 " Requires https://www.nerdfonts.com/font-downloads
@@ -53,35 +57,105 @@ Plug 'kyazdani42/nvim-web-devicons'
 " Buffers as tabs
 Plug 'romgrk/barbar.nvim'
 
-call coc#add_extension(
-  \ 'coc-rust-analyzer',
-\ )
+" Float terminal
+Plug 'voldikss/vim-floaterm'
 
+" Tree-sitter
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" plenary: lua functions
+Plug 'nvim-lua/plenary.nvim'
+
+Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/lsp_extensions.nvim'
+Plug 'hrsh7th/cmp-nvim-lsp', {'branch': 'main'}
+Plug 'hrsh7th/cmp-buffer', {'branch': 'main'}
+Plug 'hrsh7th/cmp-path', {'branch': 'main'}
+Plug 'hrsh7th/nvim-cmp', {'branch': 'main'}
+Plug 'ray-x/lsp_signature.nvim'
+
+" Only because nvim-cmp _requires_ snippets
+Plug 'hrsh7th/cmp-vsnip', {'branch': 'main'}
+Plug 'hrsh7th/vim-vsnip'
+
+Plug 'nvim-lua/lsp-status.nvim'
+Plug 'bugzmanov/vim-cfr'
+
+Plug 'mikelue/vim-maven-plugin'
+
+" vim-repeat for better . command support
+Plug 'tpope/vim-repeat'
+
+Plug 'ziglang/zig.vim'
+" 2024 - lsp
+" Plug 'williamboman/mason.nvim'    
+" Plug 'williamboman/mason-lspconfig.nvim'
 call plug#end()
 
-" if has('nvim')
-"     set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
-"     set inccommand=nosplit
-"     noremap <C-q> :confirm qall<CR>
-" end
+" LSP setup handled via vim.lsp.config
 
-" Lightline
 let g:lightline = {
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'cocstatus', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'filename': 'LightlineFilename',
-      \   'cocstatus': 'coc#status'
-      \ },
-      \ }
+   \ 'active': {
+   \   'left': [ [ 'mode', 'paste' ],
+   \             [ 'readonly', 'filename', 'modified' ,  'lspstatus'] ],
+   \   'right': [ [ 'lineinfo' ], [ 'percent' ],
+   \              [ 'linter_errors', 'linter_warnings', 'linter_infos', 'linter_hints', 'linter_ok' ]] 
+   \ },
+   \ 'component_function': {
+   \   'filename': 'LightlineFilename',
+   \   'lspstatus': 'LspStatus'
+   \ },
+   \ 'component_expand': {
+   \   'linter_hints': 'lightline#lsp#hints',
+   \   'linter_infos': 'lightline#lsp#infos',
+   \   'linter_warnings': 'lightline#lsp#warnings',
+   \   'linter_errors': 'lightline#lsp#errors',
+   \   'linter_ok': 'lightline#lsp#ok',
+   \ },
+   \ 'component_type': {
+   \     'linter_hints': 'right',
+   \     'linter_infos': 'right',
+   \     'linter_warnings': 'warning',
+   \     'linter_errors': 'error',
+   \     'linter_ok': 'right',
+   \ }
+   \ }
+
 function! LightlineFilename()
   return expand('%:t') !=# '' ? @% : '[No Name]'
 endfunction
 
-" Use auocmd to force lightline update.
-autocmd User CocStatusChange,CocDiagnosticChange call lightline#update()
+lua << END
+    local lsp_status = require('lsp-status')
+    lsp_status.register_progress()
+
+    vim.lsp.config('*', {
+        on_attach = lsp_status.on_attach,
+        capabilities = lsp_status.capabilities,
+    })
+
+    vim.lsp.config('clangd', {
+        handlers = lsp_status.extensions.clangd.setup(),
+        init_options = {
+            clangdFileStatus = true,
+        },
+    })
+
+    vim.lsp.enable({ 'clangd', 'ghcide', 'rust_analyzer', 'zls' })
+
+    if vim.fn.executable('bash-language-server') == 1 then
+        vim.lsp.enable('bashls')
+    end
+END
+
+" Statusline
+function! LspStatus() abort
+  if luaeval('#vim.lsp.buf_get_clients() > 0')
+    return luaeval("require('lsp-status').status()")
+  endif
+
+  return ''
+endfunction
 
 " Quick-save
 nmap <leader>w :w<CR>
@@ -135,43 +209,39 @@ nnoremap ? ?\v
 nnoremap / /\v
 cnoremap %s/ %sm/
 
+" make j and k move by visual line, not actual line, when text is soft-wrapped
+nmap j gj
+nmap k gk
+
 " Like idea
-nmap <C-l> $
-nmap <C-h> ^
+nmap L $
+nmap H ^
 noremap <Leader>y "*y
 noremap <Leader>p "*p
 noremap <Leader>Y "+y
 noremap <Leader>P "+p
-" map <leader>a :action $SelectAll<CR>
-" Remap for do codeAction of selected region
-function! s:cocActionsOpenFromSelected(type) abort
-  execute 'CocCommand actions.open ' . a:type
-endfunction
-xmap <silent> <leader>a :<C-u>execute 'CocCommand actions.open ' . visualmode()<CR>
-nmap <silent> <leader>a :<C-u>set operatorfunc=<SID>cocActionsOpenFromSelected<CR>g@
 
+" search the word by clicking "*"
 vnoremap * y <Esc>/<C-r>0<CR>
 nnoremap <Esc> :nohlsearch<CR>
 
-"
-" nnoremap <silent> <space>k  :Denite -resume -cursor-pos=-1 -immediately<CR>
 " Telescope search
 " Using lua functions
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+
 " Show buffers panel
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+nnoremap <leader>fm <cmd>lua require('telescope.builtin').marks()<cr>
+nnoremap <leader>fq <cmd>lua require('telescope.builtin').quickfix()<cr>
 lua require('telescope').setup{ defaults = { file_ignore_patterns = {"target", "fuzz/"} } }
 
 " Buffer navigation
-" Next buffer in list
 nnoremap <Leader>[ :BufferPrevious<CR>
-" Previous buffer in list
 nnoremap <Leader>] :BufferNext<CR>
 nnoremap <Leader>q :BufferClose<CR>
-" nmap     <Leader>] :bn<CR>  
-" nmap     <Leader>[ :bp<CR>
+nnoremap <Leader>z :BufferClose<CR>
 
 
 
@@ -186,8 +256,51 @@ set smartindent
 
 nnoremap <leader>sv :source ~/.config/nvim/init.vim<CR>
 
+" Terminal stuff  - jump out of terminal mode to normal
+if has('nvim')
+    tnoremap <C-]> <C-\><C-n> 
+endif
+
 " cargo fmt on save 
 let g:rustfmt_autosave = 1
+let g:rustfmt_emit_files = 1
+let g:rustfmt_fail_silently = 0
+let g:rust_clip_command = 'wl-copy'
+
+
+" Open a file from previous editing position
+autocmd BufReadPost *
+    \ if expand('%:p') !~# '\m/\.git/' && line("'\"") > 0 && line("'\"") <= line("$") |
+    \     exe "normal! g`\"" |
+    \ endif
+
+lua require("lsp_signature").setup({
+    \			doc_lines = 0,
+	  \			handler_opts = {
+	  \				border = "none"
+	  \			},
+	  \		})
+
+" vim-surround conflicts with leap: https://github.com/ggandor/leap.nvim/discussions/38
+
+let g:surround_no_mappings = 1
+" Just the defaults copied here.
+nmap ds       <Plug>Dsurround
+nmap cs       <Plug>Csurround
+nmap cS       <Plug>CSurround
+nmap ys       <Plug>Ysurround
+nmap yS       <Plug>YSurround
+nmap yss      <Plug>Yssurround
+nmap ySs      <Plug>YSsurround
+nmap ySS      <Plug>YSsurround
+
+" The conflicting ones. Note that `<Plug>(leap-cross-window)`
+" _does_ work in Visual mode, if jumping to the same buffer,
+" so in theory, `gs` could be useful for Leap too...
+xmap gs       <Plug>VSurround
+xmap gS       <Plug>VgSurround
+
+
 "
 " =============================================================================
 " # GUI settings
@@ -207,10 +320,12 @@ set diffopt+=iwhite " No whitespace in vimdiff
 " Make diffing better: https://vimways.org/2018/the-power-of-diff/
 set diffopt+=algorithm:patience
 set diffopt+=indent-heuristic
-" set colorcolumn=80 " and give me a colored column
+set colorcolumn=120 " and give me a colored column
+set signcolumn=yes " potentially try set signcolumn=number.
 set showcmd " Show (partial) command in status line.
 set mouse=a " Enable mouse usage (all modes) in terminals
 set shortmess+=c " don't give |ins-completion-menu| messages.
+set shortmess-=F 
 
 " Show those damn hidden characters
 " Verbose: set listchars=nbsp:¬,eol:¶,extends:»,precedes:«,trail:•
@@ -231,30 +346,12 @@ colorscheme OceanicNext
 
 highlight LineNr ctermfg=darkgrey
 
-" ============================
-"    COC + Coc Metals
-" ============================
-source ~/.config/nvim/coc-mappings.vim
-
-" nnoremap <leader> ne  :Denite -resume -cursor-pos=+1 -immediately<CR>
-" GoTo code navigation.
-nmap gd <Plug>(coc-definition)
-nmap gs <Plug>(coc-type-definition)
-nmap gi <Plug>(coc-implementation)
-" nmap gr <Plug>(coc-references)
-nmap <leader>rr <Plug>(coc-rename)
-nmap <silent> <leader>nw <Plug>(coc-diagnostic-next)
-nmap <silent> <leader>ne <Plug>(coc-diagnostic-next-error)
-" nmap <silent> <leader>nw <Plug>(coc-diagnostic-next)
-nmap <silent> <leader>np <Plug>(coc-diagnostic-prev-error)
-nmap <leader>g[ <Plug>(coc-diagnostic-prev)
-nmap <leader>g] <Plug>(coc-diagnostic-next)
-
 " Vim-test stuff
 nmap <silent> <leader>tr :TestNearest<CR>
 nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>tl :TestLast<CR>
 let test#strategy = "neovim"
+
 if has('nvim')
   tmap <C-o> <C-\><C-n><C-w>_
 endif
@@ -265,14 +362,40 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
 
-inoremap <silent><expr> <Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
 " Help Vim recognize *.sbt and *.sc as Scala files
 au BufRead,BufNewFile *.sbt,*.sc set filetype=scala
 
 " let g:node_client_debug = 1
 
+" source $HOME/.config/nvim/metals.lua.vim
+ source $HOME/.config/nvim/lsp-setup.lua.vim
+
+lua << END
+
+    -- -- Mason Setup
+    -- require("mason").setup({
+    --     ui = {
+    --         icons = {
+    --             package_installed = "",
+    --             package_pending = "",
+    --             package_uninstalled = "",
+    --         },
+    --     }
+    -- })
+    -- require("mason-lspconfig").setup()
+
+
+    -- local rt = require("rust-tools")
+
+    -- rt.setup({
+    --   server = {
+    --     on_attach = function(_, bufnr)
+    --       -- Hover actions
+    --       vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+    --       -- Code action groups
+    --       vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+    --     end,
+    --   },
+    -- })
+
+END
